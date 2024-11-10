@@ -1,9 +1,9 @@
 all:
 	echo Build full system
 	nasm -felf32 boot.asm -o boot.o
-	nasm -felf32 linkasm.asm -o linkasm.o
+	nasm -felf32 vgadisplay_drv.asm -o vgadisplay_drv.o
 	i686-elf-gcc -c kernel.c -o kernel.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra	
-	i686-elf-gcc -T linker.ld -o bonesOS.bin -ffreestanding -O2 -nostdlib boot.o kernel.o linkasm.o -lgcc
+	i686-elf-gcc -T linker.ld -o bonesOS.bin -ffreestanding -O2 -nostdlib boot.o kernel.o vgadisplay_drv.o -lgcc
 
 	# Create Disk Image for CD ROM
 	rm -f isodir/boot/bonesOS.bin
