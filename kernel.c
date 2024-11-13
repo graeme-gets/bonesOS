@@ -2,7 +2,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-extern void asmfunc();
+extern void putChar();
 
 /* Check if the compiler thinks you are targeting the wrong operating system. */
 #if defined(__linux__)
@@ -126,5 +126,5 @@ void kernel_main(void)
 	/* Newline support is left as an exercise. */
 	terminal_writestring("BONES OS version 0.1\n\r");
 	terminal_writestring("Loading Operating system\n\r");
-	asmfunc();
+	putChar('^');
 }
