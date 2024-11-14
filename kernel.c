@@ -3,7 +3,7 @@
 #include <stdint.h>
 
 extern void putChar();
-
+extern void vgaInit();
 /* Check if the compiler thinks you are targeting the wrong operating system. */
 #if defined(__linux__)
 #error "You are not using a cross-compiler, you will most certainly run into trouble"
@@ -124,7 +124,8 @@ void kernel_main(void)
 	terminal_initialize();
 
 	/* Newline support is left as an exercise. */
-	terminal_writestring("BONES OS version 0.1\n\r");
+	terminal_writestring("BONES OS version 0.1.0\n\r");
 	terminal_writestring("Loading Operating system\n\r");
+	vgaInit();
 	putChar('^');
 }
