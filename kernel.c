@@ -127,5 +127,9 @@ void kernel_main(void)
 	terminal_writestring("BONES OS version 0.1.0\n\r");
 	terminal_writestring("Loading Operating system\n\r");
 	vgaInit();
-	putChar('^');
+	putChar('H');
+	putChar('e');
+	putChar('l');
+	putChar('l');
+	putChar('o');
 }

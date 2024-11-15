@@ -14,7 +14,7 @@ LOAD vgadisplay_drv.o
 LOAD /home/graeme/opt/cross/lib/gcc/i686-elf/14.2.0/libgcc.a
                 0x00200000                        . = 0x200000
 
-.text           0x00200000      0x3cf
+.text           0x00200000      0x41c
  *(.multiboot)
  .multiboot     0x00200000        0xc boot.o
  *(.text)
@@ -22,7 +22,7 @@ LOAD /home/graeme/opt/cross/lib/gcc/i686-elf/14.2.0/libgcc.a
  .text          0x00200010        0xe boot.o
                 0x00200010                _start
  *fill*         0x0020001e        0x2 
- .text          0x00200020      0x376 kernel.o
+ .text          0x00200020      0x3a6 kernel.o
                 0x00200020                strlen
                 0x00200040                terminal_initialize
                 0x002000b0                terminal_setcolor
@@ -31,38 +31,38 @@ LOAD /home/graeme/opt/cross/lib/gcc/i686-elf/14.2.0/libgcc.a
                 0x00200180                terminal_write
                 0x00200240                terminal_writestring
                 0x00200310                kernel_main
- *fill*         0x00200396        0xa 
- .text          0x002003a0       0x2f vgadisplay_drv.o
-                0x002003a0                vgaInit
-                0x002003b0                putChar
+ *fill*         0x002003c6        0xa 
+ .text          0x002003d0       0x4c vgadisplay_drv.o
+                0x002003d0                vgaInit
+                0x002003e0                putChar
 
-.iplt           0x002003cf        0x0
- .iplt          0x002003cf        0x0 boot.o
+.iplt           0x0020041c        0x0
+ .iplt          0x0020041c        0x0 boot.o
 
-.rel.dyn        0x002003d0        0x0
- .rel.got       0x002003d0        0x0 boot.o
- .rel.iplt      0x002003d0        0x0 boot.o
+.rel.dyn        0x0020041c        0x0
+ .rel.got       0x0020041c        0x0 boot.o
+ .rel.iplt      0x0020041c        0x0 boot.o
 
 .rodata
  *(.rodata)
 
-.rodata.str1.1  0x002003cf       0x34
+.rodata.str1.1  0x0020041c       0x34
  .rodata.str1.1
-                0x002003cf       0x34 kernel.o
+                0x0020041c       0x34 kernel.o
 
 .data           0x00201000        0x0
  *(.data)
  .data          0x00201000        0x0 kernel.o
  .data          0x00201000        0x0 vgadisplay_drv.o
 
-.got            0x00200404        0x0
- .got           0x00200404        0x0 boot.o
+.got            0x00200450        0x0
+ .got           0x00200450        0x0 boot.o
 
-.got.plt        0x00200404        0x0
- .got.plt       0x00200404        0x0 boot.o
+.got.plt        0x00200450        0x0
+ .got.plt       0x00200450        0x0 boot.o
 
-.igot.plt       0x00200404        0x0
- .igot.plt      0x00200404        0x0 boot.o
+.igot.plt       0x00200450        0x0
+ .igot.plt      0x00200450        0x0 boot.o
 
 .bss            0x00201000     0x4010
  *(COMMON)
@@ -75,16 +75,16 @@ LOAD /home/graeme/opt/cross/lib/gcc/i686-elf/14.2.0/libgcc.a
                 0x0020500c                terminal_row
 OUTPUT(bonesOS.bin elf32-i386)
 
-.stab           0x00000000      0x114
+.stab           0x00000000      0x198
  .stab          0x00000000       0x60 boot.o
- .stab          0x00000060       0xb4 vgadisplay_drv.o
-                                 0xc0 (size before relaxing)
+ .stab          0x00000060      0x138 vgadisplay_drv.o
+                                0x144 (size before relaxing)
 
 .stabstr        0x00000000       0x1d
  .stabstr       0x00000000       0x1d boot.o
 
-.debug_info     0x00000000      0x73b
- .debug_info    0x00000000      0x73b kernel.o
+.debug_info     0x00000000      0x75f
+ .debug_info    0x00000000      0x75f kernel.o
 
 .debug_abbrev   0x00000000      0x212
  .debug_abbrev  0x00000000      0x212 kernel.o
@@ -103,8 +103,8 @@ OUTPUT(bonesOS.bin elf32-i386)
  .debug_rnglists
                 0x00000000      0x13f kernel.o
 
-.debug_line     0x00000000      0x4ca
- .debug_line    0x00000000      0x4ca kernel.o
+.debug_line     0x00000000      0x4ce
+ .debug_line    0x00000000      0x4ce kernel.o
 
 .debug_str      0x00000000      0x2f9
  .debug_str     0x00000000      0x2f9 kernel.o
