@@ -1,27 +1,60 @@
 [bits 32]
-global putChar
-global vgaInit
+
+global put_char
+global vga_init
+global clear_screen
 section .data
 section .text
 
 VGA_BUFFER 	equ 	0xb8000
 VGA_ROWS 	equ	80
 VGA_COLS 	equ	25
+VGA_SIZE	equ	4000
 
-vgaInit:
-	mov ax,0x0005
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; vga_init
+; Initialises the cga display, clearing the scnreen
+; and setting up the default buffer position and colors
+; forground color  : esp+8
+; background color : esp+4
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+vga_init:
+	mov ax,0x0
 	mov[CURRENT_ROW],al
-	mov[CURRENT_COL],ah
+	mov[CURRENT_COL],al
+	mov eax,[esp+8]
+	shl eax,4
+	add eax,[esp+4]
+	
+	mov[CURRENT_COLOR],al
+	
+	call clear_screen 
+	ret
+
+clear_screen:
+	
+	mov ebx,VGA_BUFFER
+	mov ah, [CURRENT_COLOR]		; Color
+	mov al, 0x20 			; character ' '
+
+	mov ecx, VGA_SIZE
+clearL:
+	mov [ebx],al
+	mov [ebx + 1],ah
+	add ebx,2
+	loop clearL
 	ret
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; PutChar 
-; Displayed a character at the next text location
-; Char to diplay as first parameter
+; calc_buffer_pos
+; calculates the buffer position gien an x/y coordinate
+; dh - x
+; dl - y
+; The buffer offset is placed in edx
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-putChar:
-	; Calculate position in buffer
+calc_buffer_pos:
 	mov dl, [CURRENT_ROW]
 	shl dl, 1
 
@@ -30,12 +63,21 @@ putChar:
 
 	mov dl, [CURRENT_COL]
 	shl dl, 1
-	
 	add al,dl
-	mov edx,eax 
 
-	mov ah, 0x0d
-	mov al,[esp+4]
+	mov edx,eax		; use whole register to Zero out unwanted data?
+	ret 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; PutChar 
+; Displayed a character at the next text location
+; Char to diplay as first parameter
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+put_char:
+	; Calculate position in buffe
+	call calc_buffer_pos
+
+	mov ah, [CURRENT_COLOR]		; Color
+	mov al, [esp+4]			; character
 	mov ebx,VGA_BUFFER
 	add ebx,edx
 	mov [ebx], al
@@ -48,4 +90,4 @@ putChar:
 
 CURRENT_ROW	db 0
 CURRENT_COL	db 0
-
+CURRENT_COLOR	db 0
