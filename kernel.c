@@ -106,9 +106,8 @@ void kernel_main(void)
 	terminal_writestring("BONES OS version 0.1.0\n\r");
 	terminal_writestring("Loading Operating system\n\r");
 	vga_init(VGA_COLOR_BROWN, VGA_COLOR_BLACK);
-	put_char('H');
-	put_char('e');
-	put_char('l');
-	put_char('l');
-	put_char('o');
+	print_string("Hello World!");
+	//put_char('A');
+
+	set_cursor();
 }

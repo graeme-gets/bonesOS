@@ -8,10 +8,10 @@
 
 extern void put_char(char c);
 extern void vga_init(uint8_t fg, uint8_t bg);
+extern void set_cursor();
+extern void print_string(char*c);
 
-
-
-/* Hardware text mode color constants. */
+/* Hardwane text mode color constants. */
 enum vga_color {
 	VGA_COLOR_BLACK 	= 0,
 	VGA_COLOR_BLUE 		= 1,

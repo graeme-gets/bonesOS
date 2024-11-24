@@ -3,6 +3,8 @@
 global put_char
 global vga_init
 global clear_screen
+global set_cursor
+global print_string
 section .data
 section .text
 
@@ -46,6 +48,53 @@ clearL:
 	loop clearL
 	ret
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; set_cursor
+; put cursor at current location
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+set_cursor:
+	call calc_buffer_pos
+	mov 	cx, dx
+	shr 	cx,1		; divide by 2
+	mov	edx,0x03D4	;VGA Index Register
+	mov	eax,0x0E0F	;Commands
+	out	dx,al		;Send "Set LOW" Command
+	inc	edx
+	mov	al,cl
+	out	dx,al		;Send LOW BYTE
+	dec	edx
+	mov	al,ah
+	out	dx,al		;Send "Set HIGH" Command
+	inc	edx
+	mov	al,ch
+	out	dx,al		;Send HIGH BYTE
+	ret
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; print_string
+; prints a NULL terminated string
+; string pointer as first parameter
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+print_string:
+	call calc_buffer_pos
+	mov ecx, [esp+4]
+	mov esi,ecx
+	mov ah, [CURRENT_COLOR]		; Color
+prloop:
+	lodsb				; Load the byte at address in SI to AL and Inc SI
+	cmp al,0			; check for end of line
+	je printStringEnd
+		
+	mov ebx,VGA_BUFFER
+	add ebx,edx
+	mov [ebx], al
+	mov [ebx + 1], ah
+	mov al, [CURRENT_COL]
+	inc al
+	mov [CURRENT_COL],al
+	add edx,2
+	jmp prloop
+printStringEnd:
+	ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; calc_buffer_pos
@@ -56,17 +105,20 @@ clearL:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 calc_buffer_pos:
 	mov dl, [CURRENT_ROW]
-	shl dl, 1
+	;shl dl, 1
 
 	mov eax, VGA_ROWS     ; load 32 bit so as to clear higher unused bits 
 	mul dl
 
 	mov dl, [CURRENT_COL]
-	shl dl, 1
+	;shl dl, 1
 	add al,dl
+	shl eax,1
 
 	mov edx,eax		; use whole register to Zero out unwanted data?
 	ret 
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; PutChar 
 ; Displayed a character at the next text location
