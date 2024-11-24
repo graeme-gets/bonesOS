@@ -81,6 +81,10 @@ print_string:
 	mov ah, [CURRENT_COLOR]		; Color
 prloop:
 	lodsb				; Load the byte at address in SI to AL and Inc SI
+	cmp al,0xd
+	je cr
+	cmp al,0xa
+	je nl
 	cmp al,0			; check for end of line
 	je printStringEnd
 		
@@ -93,6 +97,18 @@ prloop:
 	mov [CURRENT_COL],al
 	add edx,2
 	jmp prloop
+cr: 	; Process carage return
+	mov al,0
+	mov [CURRENT_COL],al
+	call calc_buffer_pos
+	jmp prloop
+nl:	; Process New Line
+	mov al,[CURRENT_ROW]
+	inc al
+	mov [CURRENT_ROW],al
+	call calc_buffer_pos
+	jmp prloop
+	
 printStringEnd:
 	ret
 
