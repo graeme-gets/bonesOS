@@ -14,7 +14,7 @@ LOAD vgadisplay_drv.o
 LOAD /home/graeme/opt/cross/lib/gcc/i686-elf/14.2.0/libgcc.a
                 0x00200000                        . = 0x200000
 
-.text           0x00200000      0x156
+.text           0x00200000      0x19c
  *(.multiboot)
  .multiboot     0x00200000        0xc boot.o
  *(.text)
@@ -22,42 +22,44 @@ LOAD /home/graeme/opt/cross/lib/gcc/i686-elf/14.2.0/libgcc.a
  .text          0x00200010        0xe boot.o
                 0x00200010                _start
  *fill*         0x0020001e        0x2 
- .text          0x00200020       0x30 kernel.o
+ .text          0x00200020       0x3c kernel.o
                 0x00200020                kernel_main
- .text          0x00200050      0x106 vgadisplay_drv.o
-                0x00200050                vga_init
-                0x00200074                clear_screen
-                0x00200091                set_cursor
-                0x002000b4                print_string
-                0x0020012b                put_char
+ *fill*         0x0020005c        0x4 
+ .text          0x00200060      0x13c vgadisplay_drv.o
+                0x00200060                vga_init
+                0x00200084                clear_screen
+                0x002000a1                set_cursor_state
+                0x002000d7                set_cursor
+                0x002000fa                print_string
+                0x00200171                put_char
 
-.iplt           0x00200156        0x0
- .iplt          0x00200156        0x0 boot.o
+.iplt           0x0020019c        0x0
+ .iplt          0x0020019c        0x0 boot.o
 
-.rel.dyn        0x00200158        0x0
- .rel.got       0x00200158        0x0 boot.o
- .rel.iplt      0x00200158        0x0 boot.o
+.rel.dyn        0x0020019c        0x0
+ .rel.got       0x0020019c        0x0 boot.o
+ .rel.iplt      0x0020019c        0x0 boot.o
 
 .rodata
  *(.rodata)
 
-.rodata.str1.1  0x00200156       0x26
+.rodata.str1.1  0x0020019c       0x26
  .rodata.str1.1
-                0x00200156       0x26 kernel.o
+                0x0020019c       0x26 kernel.o
 
 .data           0x00201000        0x0
  *(.data)
  .data          0x00201000        0x0 kernel.o
  .data          0x00201000        0x0 vgadisplay_drv.o
 
-.got            0x0020017c        0x0
- .got           0x0020017c        0x0 boot.o
+.got            0x002001c4        0x0
+ .got           0x002001c4        0x0 boot.o
 
-.got.plt        0x0020017c        0x0
- .got.plt       0x0020017c        0x0 boot.o
+.got.plt        0x002001c4        0x0
+ .got.plt       0x002001c4        0x0 boot.o
 
-.igot.plt       0x0020017c        0x0
- .igot.plt      0x0020017c        0x0 boot.o
+.igot.plt       0x002001c4        0x0
+ .igot.plt      0x002001c4        0x0 boot.o
 
 .bss            0x00201000     0x4000
  *(COMMON)
@@ -66,16 +68,16 @@ LOAD /home/graeme/opt/cross/lib/gcc/i686-elf/14.2.0/libgcc.a
  .bss           0x00205000        0x0 kernel.o
 OUTPUT(bonesOS.bin elf32-i386)
 
-.stab           0x00000000      0x480
+.stab           0x00000000      0x570
  .stab          0x00000000       0x60 boot.o
- .stab          0x00000060      0x420 vgadisplay_drv.o
-                                0x42c (size before relaxing)
+ .stab          0x00000060      0x510 vgadisplay_drv.o
+                                0x51c (size before relaxing)
 
 .stabstr        0x00000000       0x1d
  .stabstr       0x00000000       0x1d boot.o
 
-.debug_info     0x00000000      0x163
- .debug_info    0x00000000      0x163 kernel.o
+.debug_info     0x00000000      0x17c
+ .debug_info    0x00000000      0x17c kernel.o
 
 .debug_abbrev   0x00000000       0xc4
  .debug_abbrev  0x00000000       0xc4 kernel.o
@@ -84,12 +86,12 @@ OUTPUT(bonesOS.bin elf32-i386)
  .debug_aranges
                 0x00000000       0x20 kernel.o
 
-.debug_line     0x00000000       0x6a
- .debug_line    0x00000000       0x6a kernel.o
+.debug_line     0x00000000       0x6b
+ .debug_line    0x00000000       0x6b kernel.o
 
-.debug_str      0x00000000      0x209
- .debug_str     0x00000000      0x209 kernel.o
-                                0x242 (size before relaxing)
+.debug_str      0x00000000      0x21a
+ .debug_str     0x00000000      0x21a kernel.o
+                                0x253 (size before relaxing)
 
 .debug_line_str
                 0x00000000       0x7a

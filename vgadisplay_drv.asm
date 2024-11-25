@@ -4,6 +4,7 @@ global put_char
 global vga_init
 global clear_screen
 global set_cursor
+global set_cursor_state
 global print_string
 section .data
 section .text
@@ -48,12 +49,49 @@ clearL:
 	loop clearL
 	ret
 
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; set_cursor_sate
+; Enanle or disable the cursor
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+set_cursor_state:
+	; get the currect cursor state
+	mov edx, 0x03D4
+	mov eax, 0x0a
+	out dx,al
+	inc edx
+	mov eax,0
+	in al,dx
+	mov cx,[esp+4]
+	cmp cx,0
+	je curon
+curoff:
+	and al, 0xDF		; bit 5 off
+	mov cl,al
+	jmp curset
+curon:
+	or al, 0x20		; bit 5 on
+	mov cl,al
+	
+
+curset:
+	; Turn cursor on with options
+	mov 	edx,0x03D4	; VGA Index Register
+	mov	eax,0x0a		; Cursor display commands
+	out 	dx,al		; Send Command
+	mov 	al, cl		; load the cursor display bytr
+	inc	edx		; get ready to send data
+	out	dx,al		; send data
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; set_cursor
 ; put cursor at current location
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 set_cursor:
 	call calc_buffer_pos
+
 	mov 	cx, dx
 	shr 	cx,1		; divide by 2
 	mov	edx,0x03D4	;VGA Index Register
@@ -69,6 +107,7 @@ set_cursor:
 	mov	al,ch
 	out	dx,al		;Send HIGH BYTE
 	ret
+	
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; print_string
 ; prints a NULL terminated string

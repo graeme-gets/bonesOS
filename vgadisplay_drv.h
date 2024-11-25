@@ -9,6 +9,7 @@
 extern void put_char(char c);
 extern void vga_init(uint8_t fg, uint8_t bg);
 extern void set_cursor();
+extern void set_cursor_state(uint8_t state);
 extern void print_string(char*c);
 
 /* Hardwane text mode color constants. */

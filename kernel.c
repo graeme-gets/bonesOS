@@ -17,5 +17,6 @@ void kernel_main(void)
 	vga_init(VGA_COLOR_BROWN, VGA_COLOR_BLACK);
 	print_string("BONES OS version 0.1.0\n\r");
 	print_string("Hello World!");
+	set_cursor_state(1);
 	set_cursor();
 }
