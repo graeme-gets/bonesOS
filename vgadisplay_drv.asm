@@ -3,8 +3,9 @@
 global put_char
 global vga_init
 global clear_screen
-global set_cursor
-global set_cursor_state
+global cursor_set
+global cursor_state_set
+global cursor_pos_get
 global print_string
 section .data
 section .text
@@ -50,12 +51,21 @@ clearL:
 	ret
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; cursor_pos_get
+; retuens the cursor position row = H, col = L
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+cursor_pos_get:
+	mov eax, [CURRENT_ROW]
+	shl eax, 8
+	or eax, [CURRENT_COL]
+	ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; set_cursor_sate
 ; Enanle or disable the cursor
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-set_cursor_state:
+cursor_state_set:
 	push ebp		; push the base stack pointerp
 	mov ebp, esp		; copy stack pointer to base stack pointer
 	mov cx,[ebp+8]		; get and store the 1st parameter
@@ -96,7 +106,7 @@ curoff:
 ; set_cursor
 ; put cursor at current location
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-set_cursor:
+cursor_set:
 	call calc_buffer_pos
 
 	mov 	cx, dx
