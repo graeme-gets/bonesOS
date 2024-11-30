@@ -14,7 +14,7 @@ LOAD vgadisplay_drv.o
 LOAD /home/graeme/opt/cross/lib/gcc/i686-elf/14.2.0/libgcc.a
                 0x00200000                        . = 0x200000
 
-.text           0x00200000      0x19c
+.text           0x00200000      0x1a9
  *(.multiboot)
  .multiboot     0x00200000        0xc boot.o
  *(.text)
@@ -22,44 +22,44 @@ LOAD /home/graeme/opt/cross/lib/gcc/i686-elf/14.2.0/libgcc.a
  .text          0x00200010        0xe boot.o
                 0x00200010                _start
  *fill*         0x0020001e        0x2 
- .text          0x00200020       0x3c kernel.o
+ .text          0x00200020       0x3e kernel.o
                 0x00200020                kernel_main
- *fill*         0x0020005c        0x4 
- .text          0x00200060      0x13c vgadisplay_drv.o
+ *fill*         0x0020005e        0x2 
+ .text          0x00200060      0x149 vgadisplay_drv.o
                 0x00200060                vga_init
                 0x00200084                clear_screen
                 0x002000a1                set_cursor_state
-                0x002000d7                set_cursor
-                0x002000fa                print_string
-                0x00200171                put_char
+                0x002000e4                set_cursor
+                0x00200107                print_string
+                0x0020017e                put_char
 
-.iplt           0x0020019c        0x0
- .iplt          0x0020019c        0x0 boot.o
+.iplt           0x002001a9        0x0
+ .iplt          0x002001a9        0x0 boot.o
 
-.rel.dyn        0x0020019c        0x0
- .rel.got       0x0020019c        0x0 boot.o
- .rel.iplt      0x0020019c        0x0 boot.o
+.rel.dyn        0x002001ac        0x0
+ .rel.got       0x002001ac        0x0 boot.o
+ .rel.iplt      0x002001ac        0x0 boot.o
 
 .rodata
  *(.rodata)
 
-.rodata.str1.1  0x0020019c       0x26
+.rodata.str1.1  0x002001a9       0x26
  .rodata.str1.1
-                0x0020019c       0x26 kernel.o
+                0x002001a9       0x26 kernel.o
 
 .data           0x00201000        0x0
  *(.data)
  .data          0x00201000        0x0 kernel.o
  .data          0x00201000        0x0 vgadisplay_drv.o
 
-.got            0x002001c4        0x0
- .got           0x002001c4        0x0 boot.o
+.got            0x002001d0        0x0
+ .got           0x002001d0        0x0 boot.o
 
-.got.plt        0x002001c4        0x0
- .got.plt       0x002001c4        0x0 boot.o
+.got.plt        0x002001d0        0x0
+ .got.plt       0x002001d0        0x0 boot.o
 
-.igot.plt       0x002001c4        0x0
- .igot.plt      0x002001c4        0x0 boot.o
+.igot.plt       0x002001d0        0x0
+ .igot.plt      0x002001d0        0x0 boot.o
 
 .bss            0x00201000     0x4000
  *(COMMON)
@@ -68,16 +68,16 @@ LOAD /home/graeme/opt/cross/lib/gcc/i686-elf/14.2.0/libgcc.a
  .bss           0x00205000        0x0 kernel.o
 OUTPUT(bonesOS.bin elf32-i386)
 
-.stab           0x00000000      0x570
+.stab           0x00000000      0x5dc
  .stab          0x00000000       0x60 boot.o
- .stab          0x00000060      0x510 vgadisplay_drv.o
-                                0x51c (size before relaxing)
+ .stab          0x00000060      0x57c vgadisplay_drv.o
+                                0x588 (size before relaxing)
 
 .stabstr        0x00000000       0x1d
  .stabstr       0x00000000       0x1d boot.o
 
-.debug_info     0x00000000      0x17c
- .debug_info    0x00000000      0x17c kernel.o
+.debug_info     0x00000000      0x186
+ .debug_info    0x00000000      0x186 kernel.o
 
 .debug_abbrev   0x00000000       0xc4
  .debug_abbrev  0x00000000       0xc4 kernel.o

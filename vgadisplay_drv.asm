@@ -56,34 +56,41 @@ clearL:
 ; Enanle or disable the cursor
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 set_cursor_state:
-	; get the currect cursor state
-	mov edx, 0x03D4
-	mov eax, 0x0a
-	out dx,al
-	inc edx
-	mov eax,0
-	in al,dx
-	mov cx,[esp+4]
+	push ebp		; push the base stack pointerp
+	mov ebp, esp		; copy stack pointer to base stack pointer
+	mov cx,[ebp+8]		; get and store the 1st parameter
+	; process arguments
 	cmp cx,0
-	je curon
+	je curoff
+	; process turn cursor on
+	mov dx, 0x3d4
+	mov al, 0xa
+	out dx, al
+	mov dx, 0x3d5
+	mov ax, [ebp+16]
+	or al, 0xc0		; just switch off bit 5
+	out dx, al
+
+	mov dx, 0x3d4
+	mov al, 0xb
+	out dx, al
+	mov dx, 0x3d5
+	mov ax, [ebp+12]
+	or al, 0xe0		; just switch off bit 5
+	out dx, al
+	pop ebp
+	ret
 curoff:
-	and al, 0xDF		; bit 5 off
-	mov cl,al
-	jmp curset
-curon:
-	or al, 0x20		; bit 5 on
-	mov cl,al
+	mov dx, 0x3d4
+	mov al, 0xa
+	out dx, al		; Register control
 	
-
-curset:
-	; Turn cursor on with options
-	mov 	edx,0x03D4	; VGA Index Register
-	mov	eax,0x0a		; Cursor display commands
-	out 	dx,al		; Send Command
-	mov 	al, cl		; load the cursor display bytr
-	inc	edx		; get ready to send data
-	out	dx,al		; send data
-
+	mov dx, 0x3d5
+	mov al, 0x20
+	out dx, al		; set bit 5 to disable cursor
+	
+	pop ebp
+	ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; set_cursor
