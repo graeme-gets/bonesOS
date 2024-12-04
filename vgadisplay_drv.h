@@ -12,6 +12,7 @@ extern void cursor_set(); //todo: add col/row args
 extern void cursor_state_set(uint8_t state, uint8_t start, uint8_t end);
 extern void print_string(char*c);
 extern uint8_t cursor_pos_get();
+extern void print_hex(uint32_t value, uint8_t places);
 /* Hardware text mode color constants. */
 enum vga_color {
 	VGA_COLOR_BLACK 	= 0,

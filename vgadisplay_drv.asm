@@ -1,6 +1,7 @@
 [bits 32]
 
 global put_char
+global print_hex
 global vga_init
 global clear_screen
 global cursor_set
@@ -211,6 +212,41 @@ put_char:
 	mov [CURRENT_COL],al
 	ret
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Prints a byte or word in hex format
+; Assumes value is in DX and can be 32 bit value
+; Set BX to number of bytes to use
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+print_hex:
+	mov edx,[esp+4]				; save cl
+	mov al, [esp+8]			; load number of bytes for full 32 bit number
+	sub al,cl			; get number of byte to shift out for alignment	
+	mov cl,8			; set bit multiplier
+	mul cl				; multiply by byute count - we now have numebr of bits to shift right
+	mov cl,al
+	ror edx,cl
+	pop ecx				; restore cl
+	shl cl,1			; multiply by 2 for nibbles
+	; todo: could put check in for a value greater than 4
+hexLoop:
+	cmp cl,0			; if bx = 0 then exit
+        jz hexFin 
+        rol edx,4        	; Rotate the word to get first byte ready
+        dec cx
+        ; Swap 
+        mov al,dl       	; copy byte into AL
+	and al,0x0f		; clear high nibble
+        
+        ; Handle al first
+        cmp al,0x0a
+	jb nibLess
+	add al,0x07		; add offset for Hex letters
+nibLess: 			 
+	add al,0x30 
+        call put_char
+        jmp hexLoop
+hexFin:
+        ret
 
 CURRENT_ROW	db 0
 CURRENT_COL	db 0

@@ -20,5 +20,5 @@ void kernel_main(void)
 	cursor_state_set(1,0xe,0x7);
 	cursor_set();
 	uint8_t pos = cursor_pos_get();
-	put_char(pos);
+	print_hex(pos,2);
 }
