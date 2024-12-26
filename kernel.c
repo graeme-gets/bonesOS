@@ -19,6 +19,6 @@ void kernel_main(void)
 	print_string("Hello World!");
 	cursor_state_set(1,0xe,0x7);
 	cursor_set();
-	uint8_t pos = cursor_pos_get();
-	print_hex(pos,2);
+//	uint8_t pos = cursor_pos_get();
+//	print_hex(pos,2);
 }
