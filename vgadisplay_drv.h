@@ -8,10 +8,12 @@
 
 extern void put_char(char c);
 extern void vga_init(uint8_t fg, uint8_t bg);
+extern void color_set(uint8_t fg, uint8_t bg);
 extern void cursor_set(); //todo: add col/row args
 extern void cursor_state_set(uint8_t state, uint8_t start, uint8_t end);
 extern void print_string(char*c);
 extern uint8_t cursor_pos_get();
+extern void scroll_up();
 /* Hardware text mode color constants. */
 enum vga_color {
 	VGA_COLOR_BLACK 	= 0,

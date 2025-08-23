@@ -7,33 +7,66 @@ global cursor_set
 global cursor_state_set
 global cursor_pos_get
 global print_string
+global scroll_up
+global color_set
 section .data
-section .text
+
 
 VGA_BUFFER 	equ 	0xb8000
-VGA_ROWS 	equ	80
-VGA_COLS 	equ	25
-VGA_SIZE	equ	4000
+VGA_ROWS 	equ		25
+VGA_COLS 	equ		80
+VGA_SIZE	equ		4000
 
-
+section .text
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; vga_init
-; Initialises the cga display, clearing the scnreen
+; Initialises the VGA display, clearing the screen
 ; and setting up the default buffer position and colors
-; forground color  : esp+8
-; background color : esp+4
+; Param 1 : forground color  : esp+8
+; Param 2 : background color : esp+12
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 vga_init:
-	mov ax,0x0
+	push ebp						; save the stack base pointer
+	mov ebp, esp					; copy stack pointer to base stack pointer
+	; set current row and col to 0
+	xor ax,ax
 	mov[CURRENT_ROW],al
 	mov[CURRENT_COL],al
-	mov eax,[esp+8]
+	; set pointer to buffer at begining of buffer
+	mov eax,VGA_BUFFER
+	mov [CURRENT_BUFFER_PTR], eax
+	; set current color parameters
+	mov eax,[ebp+12]
+	push eax
+	mov eax,[ebp+8]
+	push eax
+	call color_set
+	call clear_screen
+	; remove the parameters 
+	pop eax 
+	pop eax 
+	pop ebp	
+							; restore the stack base pointer
+	ret
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; color_set
+; Sets the current text color
+; Param 1 : forground color  : esp+8
+; Param 2 : background color : esp+12
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+color_set:
+	push ebp
+	mov ebp,esp
+
+	; set current color
+	mov eax,[ebp+12]
 	shl eax,4
-	add eax,[esp+4]
-	
-	mov[CURRENT_COLOR],al
-	
-	call clear_screen 
+	add eax,[ebp+8]
+	mov [CURRENT_COLOR],al
+
+	pop ebp
+
 	ret
 
 clear_screen:
@@ -53,12 +86,31 @@ clearL:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; cursor_pos_get
-; retuens the cursor position row = H, col = L
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; returns the cursor position row = H, col = L
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	dec	edx
+;;;;;;;;;;;;;;;
 cursor_pos_get:
 	mov eax, [CURRENT_ROW]
 	shl eax, 8
 	or eax, [CURRENT_COL]
+	ret
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Scroll Up
+; Move entire screen buffer up by one row
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+scroll_up:
+	
+	mov eax, VGA_BUFFER
+	add eax, VGA_COLS
+	inc eax
+	mov esi, eax
+	mov edi, VGA_BUFFER
+	
+	cld
+	mov ecx,12
+	
+	rep movsb 
 	ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -131,8 +183,10 @@ cursor_set:
 ; string pointer as first parameter
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 print_string:
+	push ebp
+	mov ebp,esp
 	call calc_buffer_pos
-	mov ecx, [esp+4]
+	mov ecx, [ebp+8]
 	mov esi,ecx
 	mov ah, [CURRENT_COLOR]		; Color
 prloop:
@@ -166,27 +220,30 @@ nl:	; Process New Line
 	jmp prloop
 	
 printStringEnd:
+	pop ebp
+	call cursor_set
 	ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; calc_buffer_pos
-; calculates the buffer position gien an x/y coordinate
-; dh - x
-; dl - y
+; calculates the buffer position given an x/y coordinate
+; dh - x - col
+; dl - y - row
+; x + (y*rows)
 ; The buffer offset is placed in edx
+; position = (y_position * 80) + x_position
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 calc_buffer_pos:
-	mov dl, [CURRENT_ROW]
-	;shl dl, 1
-
-	mov eax, VGA_ROWS     ; load 32 bit so as to clear higher unused bits 
+	; y*rows
+	xor edx,edx 				; clear edx
+	xor eax,eax
+	mov dl, byte [CURRENT_ROW]		; y-pos
+	mov al, VGA_COLS     		; Load rows into Ax 
 	mul dl
-
-	mov dl, [CURRENT_COL]
-	;shl dl, 1
+	mov dl,byte [CURRENT_COL]
 	add al,dl
+	; multiply by 2 so cater for color and char
 	shl eax,1
-
 	mov edx,eax		; use whole register to Zero out unwanted data?
 	ret 
 
@@ -197,7 +254,7 @@ calc_buffer_pos:
 ; Char to diplay as first parameter
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 put_char:
-	; Calculate position in buffe
+	; Calculate position in buffer
 	call calc_buffer_pos
 
 	mov ah, [CURRENT_COLOR]		; Color
@@ -215,3 +272,4 @@ put_char:
 CURRENT_ROW	db 0
 CURRENT_COL	db 0
 CURRENT_COLOR	db 0
+CURRENT_BUFFER_PTR db 0

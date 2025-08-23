@@ -36,8 +36,8 @@ b:
 db:
 	bochsdbg.exe -qf ./bochsrc.debug
 q:
-	qemu-system-i386.exe -kernel bonesOS.bin
+	qemu-system-i386 -vga none -device VGA,edid=on,xres=1920,yres=1210 -kernel bonesOS.bin -full-screen 
 qdb:
-	qemu-system-i386.exe -s -S -kernel bonesOS.bin
+	qemu-system-i386 -s -S -vga none -device VGA,edid=on,xres=1920,yres=1210 -kernel bonesOS.bin
 
 	
