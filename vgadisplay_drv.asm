@@ -10,14 +10,20 @@ global print_string
 global scroll_up
 global color_set
 section .data
-
+section .text
 
 VGA_BUFFER 	equ 	0xb8000
 VGA_ROWS 	equ		25
 VGA_COLS 	equ		80
+VGA_COL2	equ		160
 VGA_SIZE	equ		4000
+CR			equ		0xd
+NL			equ		0xa
 
-section .text
+; VGA COMMANDS
+VGA_CURSOR_MOVE	equ 0x34D4
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; vga_init
 ; Initialises the VGA display, clearing the screen
@@ -28,6 +34,7 @@ section .text
 vga_init:
 	push ebp						; save the stack base pointer
 	mov ebp, esp					; copy stack pointer to base stack pointer
+	push eax
 	; set current row and col to 0
 	xor ax,ax
 	mov[CURRENT_ROW],al
@@ -43,9 +50,9 @@ vga_init:
 	call color_set
 	call clear_screen
 	; remove the parameters 
-	pop eax 
-	pop eax 
-	pop ebp	
+	pop eax
+	mov esp, ebp
+	pop ebp
 							; restore the stack base pointer
 	ret
 
@@ -65,12 +72,13 @@ color_set:
 	add eax,[ebp+8]
 	mov [CURRENT_COLOR],al
 
+	mov esp, ebp
 	pop ebp
 
 	ret
 
 clear_screen:
-	
+	push ebx
 	mov ebx,VGA_BUFFER
 	mov ah, [CURRENT_COLOR]		; Color
 	mov al, 0x20 			; character ' '
@@ -81,6 +89,7 @@ clearL:
 	mov [ebx + 1],ah
 	add ebx,2
 	loop clearL
+	pop ebx
 	ret
 
 
@@ -120,6 +129,9 @@ scroll_up:
 cursor_state_set:
 	push ebp		; push the base stack pointerp
 	mov ebp, esp		; copy stack pointer to base stack pointer
+	push ecx
+	push edx
+
 	mov cx,[ebp+8]		; get and store the 1st parameter
 	; process arguments
 	cmp cx,0
@@ -140,7 +152,11 @@ cursor_state_set:
 	mov ax, [ebp+12]
 	or al, 0xe0		; just switch off bit 5
 	out dx, al
+	pop edx
+	pop ecx	
+	mov esp, ebp
 	pop ebp
+
 	ret
 curoff:
 	mov dx, 0x3d4
@@ -151,6 +167,9 @@ curoff:
 	mov al, 0x20
 	out dx, al		; set bit 5 to disable cursor
 	
+	pop edx
+	pop ecx	
+	mov esp, ebp
 	pop ebp
 	ret
 
@@ -159,10 +178,12 @@ curoff:
 ; put cursor at current location
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 cursor_set:
-	call calc_buffer_pos
-
-	mov 	cx, dx
-	shr 	cx,1		; divide by 2
+	push edx
+	push ecx
+	mov eax,[CURRENT_BUFFER_PTR]
+	sub eax, VGA_BUFFER
+	mov cx, ax
+	shr cx,1		; divide by 2
 	mov	edx,0x03D4	;VGA Index Register
 	mov	eax,0x0E0F	;Commands
 	out	dx,al		;Send "Set LOW" Command
@@ -175,6 +196,8 @@ cursor_set:
 	inc	edx
 	mov	al,ch
 	out	dx,al		;Send HIGH BYTE
+	pop ecx
+	pop edx	
 	ret
 	
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -185,41 +208,49 @@ cursor_set:
 print_string:
 	push ebp
 	mov ebp,esp
-	call calc_buffer_pos
+	push esi
+	push edx
 	mov ecx, [ebp+8]
 	mov esi,ecx
 	mov ah, [CURRENT_COLOR]		; Color
+	mov edx,[CURRENT_BUFFER_PTR]			; set up the buffer
 prloop:
-	lodsb				; Load the byte at address in SI to AL and Inc SI
-	cmp al,0xd
-	je cr
-	cmp al,0xa
-	je nl
-	cmp al,0			; check for end of line
+	lodsb						; Load the byte at address in SI to AL and Inc SI
+	cmp al,0					; check for end of line
 	je printStringEnd
+	cmp al,NL					; check for new line
+	je nl
+	cmp al,CR					; check for carage return
+	je cr
 		
-	mov ebx,VGA_BUFFER
-	add ebx,edx
-	mov [ebx], al
-	mov [ebx + 1], ah
-	mov al, [CURRENT_COL]
-	inc al
-	mov [CURRENT_COL],al
-	add edx,2
+	mov [edx], al
+	mov [edx + 1], ah
+	inc edx
+	inc edx
 	jmp prloop
-cr: 	; Process carage return
-	mov al,0
-	mov [CURRENT_COL],al
-	call calc_buffer_pos
+cr: ; Process carage return
+	push edx
+	push ecx
+	mov eax,edx					; set up for div
+	sub eax, VGA_BUFFER
+	xor edx,edx
+	mov ecx,VGA_COL2			; mod into ecx
+	div ecx
+	mov eax,edx
+	pop ecx
+	pop edx
+	sub edx,eax
 	jmp prloop
 nl:	; Process New Line
-	mov al,[CURRENT_ROW]
-	inc al
-	mov [CURRENT_ROW],al
-	call calc_buffer_pos
+	add edx,VGA_COL2
 	jmp prloop
 	
 printStringEnd:
+	; save the vga buffer location
+	mov [CURRENT_BUFFER_PTR],edx
+	pop edx
+	pop esi
+	mov esp, ebp
 	pop ebp
 	call cursor_set
 	ret
@@ -272,4 +303,4 @@ put_char:
 CURRENT_ROW	db 0
 CURRENT_COL	db 0
 CURRENT_COLOR	db 0
-CURRENT_BUFFER_PTR db 0
+CURRENT_BUFFER_PTR dd 0
