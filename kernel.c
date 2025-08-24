@@ -23,6 +23,7 @@ void kernel_main(void)
 	print_string("Line 3\n\r");
 	print_string("Line 4\n\r");
 	print_string("Line 5");
+	put_char('A');
 	//scroll_up();
 	//cursor_state_set(1,0xe,0x7);
 	//cursor_set();

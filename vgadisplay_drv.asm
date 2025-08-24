@@ -9,8 +9,9 @@ global cursor_pos_get
 global print_string
 global scroll_up
 global color_set
-section .data
+
 section .text
+%include "codeHelpers.inc"
 
 VGA_BUFFER 	equ 	0xb8000
 VGA_ROWS 	equ		25
@@ -19,6 +20,7 @@ VGA_COL2	equ		160
 VGA_SIZE	equ		4000
 CR			equ		0xd
 NL			equ		0xa
+NULL		equ		0x0
 
 ; VGA COMMANDS
 VGA_CURSOR_MOVE	equ 0x34D4
@@ -285,21 +287,52 @@ calc_buffer_pos:
 ; Char to diplay as first parameter
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 put_char:
-	; Calculate position in buffer
-	call calc_buffer_pos
-
+	frameStart
 	mov ah, [CURRENT_COLOR]		; Color
-	mov al, [esp+4]			; character
-	mov ebx,VGA_BUFFER
-	add ebx,edx
-	mov [ebx], al
-	mov [ebx + 1], ah
-	mov al, [CURRENT_COL]
-	inc al
-	mov [CURRENT_COL],al
+	mov al, [ebp+8]			; character
+	mov edx,[CURRENT_BUFFER_PTR]
+	
+	cmp al,NULL					; check for end of line
+	je putEnd
+	cmp al,NL					; check for new line
+	je putNL
+	cmp al,CR					; check for carage return
+	je putCR
+		
+	mov [edx], al
+	mov [edx + 1], ah
+	inc edx
+	inc edx
+	je putEnd
+putCR: ; Process carage return
+	push edx
+	push ecx
+	mov eax,edx					; set up for div
+	sub eax, VGA_BUFFER
+	xor edx,edx
+	mov ecx,VGA_COL2			; mod into ecx
+	div ecx
+	mov eax,edx
+	pop ecx
+	pop edx
+	sub edx,eax
+	jmp prloop
+putNL:	; Process New Line
+	add edx,VGA_COL2
+	jmp prloop
+	
+putEnd:
+	; save the vga buffer location
+	mov [CURRENT_BUFFER_PTR],edx
+	pop edx
+	pop esi
+	call cursor_set
+	frameEnd
+	
 	ret
 
 
+section .data
 CURRENT_ROW	db 0
 CURRENT_COL	db 0
 CURRENT_COLOR	db 0

@@ -14,7 +14,7 @@ LOAD vgadisplay_drv.o
 LOAD /home/graeme/opt/cross/lib/gcc/i686-elf/14.2.0/libgcc.a
                 0x00200000                        . = 0x200000
 
-.text           0x00200000      0x230
+.text           0x00200000      0x271
  *(.multiboot)
  .multiboot     0x00200000        0xc boot.o
  *(.text)
@@ -22,53 +22,53 @@ LOAD /home/graeme/opt/cross/lib/gcc/i686-elf/14.2.0/libgcc.a
  .text          0x00200010        0xe boot.o
                 0x00200010                _start
  *fill*         0x0020001e        0x2 
- .text          0x00200020       0x5c kernel.o
+ .text          0x00200020       0x68 kernel.o
                 0x00200020                kernel_main
- *fill*         0x0020007c        0x4 
- .text          0x00200080      0x1b0 vgadisplay_drv.o
-                0x00200080                vga_init
-                0x002000b2                color_set
-                0x002000c7                clear_screen
-                0x002000e6                cursor_pos_get
-                0x002000f5                scroll_up
-                0x0020010e                cursor_state_set
-                0x0020015b                cursor_set
-                0x00200187                print_string
-                0x00200201                put_char
+ *fill*         0x00200088        0x8 
+ .text          0x00200090      0x1e1 vgadisplay_drv.o
+                0x00200090                vga_init
+                0x002000c2                color_set
+                0x002000d7                clear_screen
+                0x002000f6                cursor_pos_get
+                0x00200105                scroll_up
+                0x0020011e                cursor_state_set
+                0x0020016b                cursor_set
+                0x00200197                print_string
+                0x00200211                put_char
 
-.iplt           0x00200230        0x0
- .iplt          0x00200230        0x0 boot.o
+.iplt           0x00200271        0x0
+ .iplt          0x00200271        0x0 boot.o
 
-.rel.dyn        0x00200230        0x0
- .rel.got       0x00200230        0x0 boot.o
- .rel.iplt      0x00200230        0x0 boot.o
+.rel.dyn        0x00200274        0x0
+ .rel.got       0x00200274        0x0 boot.o
+ .rel.iplt      0x00200274        0x0 boot.o
 
 .rodata
  *(.rodata)
 
-.rodata.str1.1  0x00200230       0x40
+.rodata.str1.1  0x00200271       0x40
  .rodata.str1.1
-                0x00200230       0x40 kernel.o
+                0x00200271       0x40 kernel.o
 
-.data           0x00201000        0x0
+.data           0x00201000        0x7
  *(.data)
  .data          0x00201000        0x0 kernel.o
- .data          0x00201000        0x0 vgadisplay_drv.o
+ .data          0x00201000        0x7 vgadisplay_drv.o
 
-.got            0x00200270        0x0
- .got           0x00200270        0x0 boot.o
+.got            0x00201008        0x0
+ .got           0x00201008        0x0 boot.o
 
-.got.plt        0x00200270        0x0
- .got.plt       0x00200270        0x0 boot.o
+.got.plt        0x00201008        0x0
+ .got.plt       0x00201008        0x0 boot.o
 
-.igot.plt       0x00200270        0x0
- .igot.plt      0x00200270        0x0 boot.o
+.igot.plt       0x00201008        0x0
+ .igot.plt      0x00201008        0x0 boot.o
 
-.bss            0x00201000     0x4000
+.bss            0x00202000     0x4000
  *(COMMON)
  *(.bss)
- .bss           0x00201000     0x4000 boot.o
- .bss           0x00205000        0x0 kernel.o
+ .bss           0x00202000     0x4000 boot.o
+ .bss           0x00206000        0x0 kernel.o
 OUTPUT(bonesOS.bin elf32-i386)
 
 .debug_aranges  0x00000000       0x60
@@ -86,20 +86,20 @@ OUTPUT(bonesOS.bin elf32-i386)
  .debug_pubnames
                 0x00000000        0x0 vgadisplay_drv.o
 
-.debug_info     0x00000000      0x22c
+.debug_info     0x00000000      0x245
  .debug_info    0x00000000       0x59 boot.o
- .debug_info    0x00000059      0x170 kernel.o
- .debug_info    0x000001c9       0x63 vgadisplay_drv.o
+ .debug_info    0x00000059      0x189 kernel.o
+ .debug_info    0x000001e2       0x63 vgadisplay_drv.o
 
 .debug_abbrev   0x00000000       0xda
  .debug_abbrev  0x00000000       0x1d boot.o
  .debug_abbrev  0x0000001d       0xa0 kernel.o
  .debug_abbrev  0x000000bd       0x1d vgadisplay_drv.o
 
-.debug_line     0x00000000      0x1ae
+.debug_line     0x00000000      0x1f0
  .debug_line    0x00000000       0x44 boot.o
- .debug_line    0x00000044       0x6a kernel.o
- .debug_line    0x000000ae      0x100 vgadisplay_drv.o
+ .debug_line    0x00000044       0x6b kernel.o
+ .debug_line    0x000000af      0x141 vgadisplay_drv.o
 
 .debug_frame    0x00000000       0x38
  .debug_frame   0x00000000        0x0 boot.o
@@ -111,9 +111,9 @@ OUTPUT(bonesOS.bin elf32-i386)
  .debug_loc     0x00000000        0x0 boot.o
  .debug_loc     0x00000000        0x0 vgadisplay_drv.o
 
-.debug_str      0x00000000      0x1fe
- .debug_str     0x00000000      0x1fe kernel.o
-                                0x237 (size before relaxing)
+.debug_str      0x00000000      0x207
+ .debug_str     0x00000000      0x207 kernel.o
+                                0x240 (size before relaxing)
 
 .debug_line_str
                 0x00000000       0x7c
