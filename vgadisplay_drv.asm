@@ -178,14 +178,14 @@ curoff:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; set_cursor
 ; put cursor at current location
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;je printStringEnd;;;;;;;;;
 cursor_set:
 	push edx
 	push ecx
 	mov eax,[CURRENT_BUFFER_PTR]
 	sub eax, VGA_BUFFER
 	mov cx, ax
-	shr cx,1		; divide by 2
+	shr cx,1		; divide by 2 because of word per position (color \ chr)
 	mov	edx,0x03D4	;VGA Index Register
 	mov	eax,0x0E0F	;Commands
 	out	dx,al		;Send "Set LOW" Command
@@ -214,42 +214,16 @@ print_string:
 	push edx
 	mov ecx, [ebp+8]
 	mov esi,ecx
-	mov ah, [CURRENT_COLOR]		; Color
-	mov edx,[CURRENT_BUFFER_PTR]			; set up the buffer
 prloop:
 	lodsb						; Load the byte at address in SI to AL and Inc SI
+	mov ah,[CURRENT_COLOR]
 	cmp al,0					; check for end of line
 	je printStringEnd
-	cmp al,NL					; check for new line
-	je nl
-	cmp al,CR					; check for carage return
-	je cr
-		
-	mov [edx], al
-	mov [edx + 1], ah
-	inc edx
-	inc edx
+	call putDirect
 	jmp prloop
-cr: ; Process carage return
-	push edx
-	push ecx
-	mov eax,edx					; set up for div
-	sub eax, VGA_BUFFER
-	xor edx,edx
-	mov ecx,VGA_COL2			; mod into ecx
-	div ecx
-	mov eax,edx
-	pop ecx
-	pop edx
-	sub edx,eax
-	jmp prloop
-nl:	; Process New Line
-	add edx,VGA_COL2
-	jmp prloop
-	
 printStringEnd:
 	; save the vga buffer location
-	mov [CURRENT_BUFFER_PTR],edx
+	;mov [CURRENT_BUFFER_PTR],edx
 	pop edx
 	pop esi
 	mov esp, ebp
@@ -290,10 +264,13 @@ put_char:
 	frameStart
 	mov ah, [CURRENT_COLOR]		; Color
 	mov al, [ebp+8]			; character
+	jmp putStart
+putDirect:
+	frameStart
+putStart:
+	push edx
 	mov edx,[CURRENT_BUFFER_PTR]
-	
-	cmp al,NULL					; check for end of line
-	je putEnd
+	; Check for special characters
 	cmp al,NL					; check for new line
 	je putNL
 	cmp al,CR					; check for carage return
@@ -303,7 +280,7 @@ put_char:
 	mov [edx + 1], ah
 	inc edx
 	inc edx
-	je putEnd
+	jmp putEnd
 putCR: ; Process carage return
 	push edx
 	push ecx
@@ -316,16 +293,15 @@ putCR: ; Process carage return
 	pop ecx
 	pop edx
 	sub edx,eax
-	jmp prloop
+	jmp putEnd
 putNL:	; Process New Line
 	add edx,VGA_COL2
-	jmp prloop
 	
 putEnd:
 	; save the vga buffer location
+	
 	mov [CURRENT_BUFFER_PTR],edx
 	pop edx
-	pop esi
 	call cursor_set
 	frameEnd
 	
