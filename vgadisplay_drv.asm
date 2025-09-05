@@ -1,5 +1,6 @@
-[bits 32]
 
+
+[bits 32]
 global put_char
 global vga_init
 global clear_screen
@@ -9,6 +10,7 @@ global cursor_pos_get
 global print_string
 global scroll_up
 global color_set
+global cursor_set_position
 
 section .text
 %include "codeHelpers.inc"
@@ -18,12 +20,18 @@ VGA_ROWS 	equ		25
 VGA_COLS 	equ		80
 VGA_COL2	equ		160
 VGA_SIZE	equ		4000
+VGA_END		equ		VGA_BUFFER + VGA_SIZE
 CR			equ		0xd
 NL			equ		0xa
 NULL		equ		0x0
 
+ERR_OK		equ		0
+ERR_COL 	equ		-1
+ERR_ROW 	equ		-2
+
 ; VGA COMMANDS
 VGA_CURSOR_MOVE	equ 0x34D4
+
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -111,17 +119,22 @@ cursor_pos_get:
 ; Move entire screen buffer up by one row
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 scroll_up:
-	
+	push edx
+	push esi
+	push ecx
 	mov eax, VGA_BUFFER
-	add eax, VGA_COLS
-	inc eax
+	add eax, VGA_COL2
+
 	mov esi, eax
 	mov edi, VGA_BUFFER
 	
 	cld
-	mov ecx,12
+	mov ecx,VGA_SIZE
 	
 	rep movsb 
+	pop ecx
+	pop esi
+	pop edx
 	ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -178,7 +191,7 @@ curoff:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; set_cursor
 ; put cursor at current location
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;je printStringEnd;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 cursor_set:
 	push edx
 	push ecx
@@ -232,27 +245,61 @@ printStringEnd:
 	ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; calc_buffer_pos
-; calculates the buffer position given an x/y coordinate
-; dh - x - col
-; dl - y - row
+; CursorPut 
+; Sets the cursor to the xy location given by the
+; paramaters
+; Param 1 : x 
+; Param 2 : y
 ; x + (y*rows)
-; The buffer offset is placed in edx
 ; position = (y_position * 80) + x_position
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-calc_buffer_pos:
+cursor_set_position:
+	frameStart
+	push ecx
+	; Get the xy parameters
+	xor edx,edx
+	mov ch, [ebp+12] ; y parameter
+	mov cl, [ebp+8]  ; x parameter
+	; Validate xy parameters
+	cmp cl, VGA_ROWS
+	jg y_param_error
+	cmp ch , VGA_COLS
+	jg x_param_error
+	add eax,edx
 	; y*rows
-	xor edx,edx 				; clear edx
 	xor eax,eax
-	mov dl, byte [CURRENT_ROW]		; y-pos
-	mov al, VGA_COLS     		; Load rows into Ax 
-	mul dl
-	mov dl,byte [CURRENT_COL]
-	add al,dl
+	mov ax, VGA_COLS     		; Load rows into Ax 
+	mul ch
+
+	add al, cl
+	
 	; multiply by 2 so cater for color and char
 	shl eax,1
-	mov edx,eax		; use whole register to Zero out unwanted data?
+
+	; Add the buffer start point
+	add eax, VGA_BUFFER
+
+	mov [CURRENT_BUFFER_PTR],eax		; use whole register to Zero out unwanted data?
+	call cursor_set
+	; set return value to 0
+	mov eax,0
+	mov edx,0
+	jmp fin
+x_param_error:
+	mov edx, 0x00
+	mov eax, ERR_COL
+	jmp fin
+y_param_error:
+	mov edx, 0x00
+	mov eax, ERR_ROW
+fin:
+	pop ecx
+	frameEnd
+	
 	ret 
+
+
+
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -278,8 +325,16 @@ putStart:
 		
 	mov [edx], al
 	mov [edx + 1], ah
+	;move to next position
 	inc edx
 	inc edx
+	; check end of screen
+	cmp edx,VGA_END
+	jne putEnd
+	; else scroll screen up by one
+	call scroll_up
+	; adjust buffer pointer
+	sub edx,VGA_COL2
 	jmp putEnd
 putCR: ; Process carage return
 	push edx

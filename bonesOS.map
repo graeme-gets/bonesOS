@@ -14,7 +14,7 @@ LOAD vgadisplay_drv.o
 LOAD /home/graeme/opt/cross/lib/gcc/i686-elf/14.2.0/libgcc.a
                 0x00200000                        . = 0x200000
 
-.text           0x00200000      0x232
+.text           0x00200000      0x28b
  *(.multiboot)
  .multiboot     0x00200000        0xc boot.o
  *(.text)
@@ -22,33 +22,38 @@ LOAD /home/graeme/opt/cross/lib/gcc/i686-elf/14.2.0/libgcc.a
  .text          0x00200010        0xe boot.o
                 0x00200010                _start
  *fill*         0x0020001e        0x2 
- .text          0x00200020       0x68 kernel.o
+ .text          0x00200020       0x67 kernel.o
                 0x00200020                kernel_main
- *fill*         0x00200088        0x8 
- .text          0x00200090      0x1a2 vgadisplay_drv.o
+ *fill*         0x00200087        0x9 
+ .text          0x00200090      0x1fb vgadisplay_drv.o
                 0x00200090                vga_init
                 0x002000c2                color_set
                 0x002000d7                clear_screen
                 0x002000f6                cursor_pos_get
                 0x00200105                scroll_up
-                0x0020011e                cursor_state_set
-                0x0020016b                cursor_set
-                0x00200197                print_string
-                0x002001d9                put_char
+                0x00200125                cursor_state_set
+                0x00200172                cursor_set
+                0x0020019e                print_string
+                0x002001c5                cursor_set_position
+                0x0020021f                put_char
 
-.iplt           0x00200232        0x0
- .iplt          0x00200232        0x0 boot.o
+.iplt           0x0020028b        0x0
+ .iplt          0x0020028b        0x0 boot.o
 
-.rel.dyn        0x00200234        0x0
- .rel.got       0x00200234        0x0 boot.o
- .rel.iplt      0x00200234        0x0 boot.o
+.rel.dyn        0x0020028c        0x0
+ .rel.got       0x0020028c        0x0 boot.o
+ .rel.iplt      0x0020028c        0x0 boot.o
 
 .rodata
  *(.rodata)
 
-.rodata.str1.1  0x00200232       0x40
+.rodata.str1.1  0x0020028b       0x30
  .rodata.str1.1
-                0x00200232       0x40 kernel.o
+                0x0020028b       0x30 kernel.o
+
+.rodata.str1.4  0x002002bc       0x52
+ .rodata.str1.4
+                0x002002bc       0x52 kernel.o
 
 .data           0x00201000        0x7
  *(.data)
@@ -86,20 +91,20 @@ OUTPUT(bonesOS.bin elf32-i386)
  .debug_pubnames
                 0x00000000        0x0 vgadisplay_drv.o
 
-.debug_info     0x00000000      0x245
+.debug_info     0x00000000      0x266
  .debug_info    0x00000000       0x59 boot.o
- .debug_info    0x00000059      0x189 kernel.o
- .debug_info    0x000001e2       0x63 vgadisplay_drv.o
+ .debug_info    0x00000059      0x1aa kernel.o
+ .debug_info    0x00000203       0x63 vgadisplay_drv.o
 
-.debug_abbrev   0x00000000       0xda
+.debug_abbrev   0x00000000      0x101
  .debug_abbrev  0x00000000       0x1d boot.o
- .debug_abbrev  0x0000001d       0xa0 kernel.o
- .debug_abbrev  0x000000bd       0x1d vgadisplay_drv.o
+ .debug_abbrev  0x0000001d       0xc7 kernel.o
+ .debug_abbrev  0x000000e4       0x1d vgadisplay_drv.o
 
-.debug_line     0x00000000      0x1e7
+.debug_line     0x00000000      0x225
  .debug_line    0x00000000       0x44 boot.o
- .debug_line    0x00000044       0x6b kernel.o
- .debug_line    0x000000af      0x138 vgadisplay_drv.o
+ .debug_line    0x00000044       0x73 kernel.o
+ .debug_line    0x000000b7      0x16e vgadisplay_drv.o
 
 .debug_frame    0x00000000       0x38
  .debug_frame   0x00000000        0x0 boot.o
@@ -111,9 +116,9 @@ OUTPUT(bonesOS.bin elf32-i386)
  .debug_loc     0x00000000        0x0 boot.o
  .debug_loc     0x00000000        0x0 vgadisplay_drv.o
 
-.debug_str      0x00000000      0x207
- .debug_str     0x00000000      0x207 kernel.o
-                                0x240 (size before relaxing)
+.debug_str      0x00000000      0x212
+ .debug_str     0x00000000      0x212 kernel.o
+                                0x252 (size before relaxing)
 
 .debug_line_str
                 0x00000000       0x7c

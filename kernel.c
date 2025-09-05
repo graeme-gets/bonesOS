@@ -16,15 +16,28 @@
 
 void kernel_main(void) 
 {
+
 	vga_init(VGA_COLOR_BROWN, VGA_COLOR_BLACK);
 	print_string("BONES OS version 0.1.0\r\n");
 	print_string("Hello World\n\r");
 	print_string("Hello World\n\r");
 	print_string("Line 3\n\r");
-	print_string("Line 4\n\r");
-	print_string("Line 5");
-	put_char('A');
-	//scroll_up();
+	int8_t ret;
+	
+	ret = cursor_set_position(0,24);
+//	if (ret ==0)
+	//	print_string("Set Pos OK\n\r");
+	//else if (ret == ERR_COL)
+	//	print_string("Error ROW");
+	//else if (ret == ERR_ROW)
+	//	print_string("ERROR ROW");
+	//else
+	//	print_string("Bad retturn value");
+print_string("123456789012345678901234567890123456789012345678901234567890123456789012345678901");
+print_string("123456789012345678901234567890123456789012345678901234567890123456789012345678901");
+	//print_string("Line 5");
+	//put_char('A');
+//	scroll_up();
 	//cursor_state_set(1,0xe,0x7);
 	//cursor_set();
 	//uint8_t pos = cursor_pos_get();
