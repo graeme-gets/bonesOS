@@ -1,6 +1,9 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include "common.h"
+#include "idt.h"
+#include "isr.h"
 #include "vgadisplay_drv.h"
 /* Check if the compiler thinks you are targeting the wrong operating system. */
 #if defined(__linux__)
@@ -22,9 +25,9 @@ void kernel_main(void)
 	print_string("Hello World\n\r");
 	print_string("Hello World\n\r");
 	print_string("Line 3\n\r");
-	int8_t ret;
-	
-	ret = cursor_set_position(0,24);
+//	int8_t ret;
+//	ret = cursor_set_position(0,24);
+	cursor_pos_get(0,24);
 //	if (ret ==0)
 	//	print_string("Set Pos OK\n\r");
 	//else if (ret == ERR_COL)

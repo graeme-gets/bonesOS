@@ -3,9 +3,8 @@ all:
 	nasm -felf32 -g boot.asm -o boot.o
 	nasm -felf32 -g vgadisplay_drv.asm -o vgadisplay_drv.o
 	nasm -felf32 -g gdt.asm -o gdt.o
-	nasm -felf32 -g idt.asm -o idt.o
-	nasm -felf32 -g isr.asm -o isr.o
-	i686-elf-gcc -g -c kernel.c -o kernel.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra	
+	i686-elf-gcc -g -c *.c  -std=gnu99 -ffreestanding -O2 -Wall -Wextra	
+	#i686-elf-gcc -g -c isr.c -o isr.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra	
 	i686-elf-gcc -Xlinker -Map bonesOS.map -T linker.ld -o bonesOS.bin -ffreestanding -O2 -nostdlib boot.o kernel.o vgadisplay_drv.o gdt.o isr.o idt.o -lgcc
 
 	# Create Disk Image for CD ROM
@@ -18,7 +17,7 @@ all:
 	grub-file --is-x86-multiboot bonesOS.bin
 
 	echo Complete
-
+clean : rm *.o
 
 c:	
 	i686-elf-gcc -c kernel.c -o kernel.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra

@@ -12,7 +12,7 @@ extern void color_set(uint8_t fg, uint8_t bg);
 extern void cursor_set(); 
 extern uint8_t cursor_set_position(uint8_t x, uint8_t y);
 extern void cursor_state_set(uint8_t state, uint8_t start, uint8_t end);
-extern void print_string(char*c);
+extern void print_string(const char*c);
 extern uint8_t cursor_pos_get();
 extern void scroll_up();
 

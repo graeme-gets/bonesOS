@@ -1,3 +1,4 @@
+
 ; Declare constants for the multiboot header.
 MBALIGN  equ  1 << 0            ; align loaded modules on page boundaries
 MEMINFO  equ  1 << 1            ; provide memory map
@@ -64,9 +65,9 @@ _start:
 	; C++ features such as global constructors and exceptions will require
 	; runtime support to work as well.
 	extern gdt_load
-	extern idt_load
+	extern idt_install
 	call gdt_load
-	call idt_load
+	call idt_install
 
 	; Enter the high-level kernel. The ABI requires the stack is 16-byte
 	; aligned at the time of the call instruction (which afterwards pushes
