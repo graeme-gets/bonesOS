@@ -1,0 +1,1 @@
+void charToHex(char c,char *hex);

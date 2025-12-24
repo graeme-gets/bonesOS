@@ -1,45 +1,44 @@
-all:
+
+BUILD_DIR = build
+C_SOURCES := $(wildcard *.c)
+ASM_SOURCES := $(wildcard *.asm)
+OBJS := $(C_SOURCES:%.c=$(BUILD_DIR)/%.o)
+ASM_OBJS := $(ASM_SOURCES:%.asm=$(BUILD_DIR)/%.o)
+CC := i686-elf-gcc
+CFLAGS := -g -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+
+all: $(OBJS) $(ASM_OBJS)
 	echo Build full system
-	nasm -felf32 -g boot.asm -o boot.o
-	nasm -felf32 -g vgadisplay_drv.asm -o vgadisplay_drv.o
-	nasm -felf32 -g gdt.asm -o gdt.o
-	i686-elf-gcc -g -c *.c  -std=gnu99 -ffreestanding -O2 -Wall -Wextra	
-	#i686-elf-gcc -g -c isr.c -o isr.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra	
-	i686-elf-gcc -Xlinker -Map bonesOS.map -T linker.ld -o bonesOS.bin -ffreestanding -O2 -nostdlib boot.o kernel.o vgadisplay_drv.o gdt.o isr.o idt.o -lgcc
+	$(CC) -Xlinker -Map $(BUILD_DIR)/bonesOS.map -T linker.ld -o $(BUILD_DIR)/bonesOS.bin -ffreestanding -O2 -nostdlib $(OBJS) $(ASM_OBJS) -lgcc
+
 
 	# Create Disk Image for CD ROM
-	rm -f isodir/boot/bonesOS.bin
-	rm -f isofor/boot/grub.cfg
-	cp bonesOS.bin isodir/boot/bonesOS.bin
-	cp grub.cfg isodir/boot/grub/grub.cfg
-	grub-mkrescue -o bonesOS.iso isodir
+	mkdir -p $(BUILD_DIR)/isodir/boot/grub
+	rm -f $(BUILD_DIR)/isodir/boot/bonesOS.bin
+	rm -f $(BUILD_DIR)/isodir/boot/grub.cfg
+	cp $(BUILD_DIR)/bonesOS.bin $(BUILD_DIR)/isodir/boot/bonesOS.bin
+	cp grub.cfg $(BUILD_DIR)/isodir/boot/grub/grub.cfg
+	grub-mkrescue -o $(BUILD_DIR)/bonesOS.iso $(BUILD_DIR)/isodir
 
-	grub-file --is-x86-multiboot bonesOS.bin
-
-	echo Complete
-clean : rm *.o
-
-c:	
-	i686-elf-gcc -c kernel.c -o kernel.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-l:
-	i686-elf-gcc -T linker.ld -o bonesOS.bin -ffreestanding -O2 -nostdlib boot.o kernel.o -lgcc
-cd:
-	rm -f isodir/boot/bonesOS.bin
-	rm -f isofor/boot/grub.cfg
-	cp bonesOS.bin isodir/boot/bonesOS.bin
-	cp grub.cfg isodir/boot/grub/grub.cfg
-	grub-mkrescue -o bonesOS.iso isodir
-
-	grub-file --is-x86-multiboot bonesOS.bin
+	grub-file --is-x86-multiboot $(BUILD_DIR)/bonesOS.bin
 
 	echo Complete
-b: 
-	bochs.exe -qf ./bochsrc.bones
-db:
-	bochsdbg.exe -qf ./bochsrc.debug
+
+$(BUILD_DIR)/%.o: %.c | $(BUILD_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/%.o: %.asm | $(BUILD_DIR)
+	nasm -felf32 -g $< -o $@
+
+$(BUILD_DIR):
+	mkdir -p $(BUILD_DIR)
+
+clean:
+	rm -rf $(BUILD_DIR) *.o bonesOS.bin bonesOS.iso
+
 q:
-	qemu-system-i386 -vga none -device VGA,edid=on,xres=1920,yres=1210 -kernel bonesOS.bin -full-screen 
+	qemu-system-i386 -vga none -device VGA,edid=on,xres=1920,yres=1210 -kernel $(BUILD_DIR)/bonesOS.bin -full-screen
 qdb:
-	qemu-system-i386 -s -S -vga none -device VGA,edid=on,xres=1920,yres=1210 -kernel bonesOS.bin
+	qemu-system-i386 -s -S -vga none -device VGA,edid=on,xres=1920,yres=1210 -kernel $(BUILD_DIR)/bonesOS.bin
 
 	

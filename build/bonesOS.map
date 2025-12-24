@@ -1,0 +1,290 @@
+
+There are no discarded input sections
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+LOAD build/common.o
+LOAD build/convert.o
+LOAD build/kernel.o
+LOAD build/keyboard_drv.o
+LOAD build/boot.o
+LOAD build/gdt.o
+LOAD build/irq.o
+LOAD build/isr.o
+LOAD build/vgadisplay_drv.o
+LOAD /home/graeme/opt/cross/lib/gcc/i686-elf/14.2.0/libgcc.a
+                0x00200000                        . = 0x200000
+
+.text           0x00200000      0xd1b
+ *(.multiboot)
+ .multiboot     0x00200000        0xc build/boot.o
+ *(.text)
+ *fill*         0x0020000c        0x4 
+ .text          0x00200010       0x43 build/common.o
+                0x00200010                memset
+ *fill*         0x00200053        0xd 
+ .text          0x00200060       0x37 build/convert.o
+                0x00200060                charToHex
+ *fill*         0x00200097        0x9 
+ .text          0x002000a0      0x7c8 build/kernel.o
+                0x002000a0                cb_keyboardInterrupt
+                0x002000f0                idt_set_gate
+                0x00200130                idt_install
+                0x00200170                isrs_install
+                0x00200750                isr_handler
+                0x002007c0                irq_handler
+                0x00200800                register_interrupt_handler
+                0x00200820                kernel_main
+ *fill*         0x00200868        0x8 
+ .text          0x00200870       0x16 build/keyboard_drv.o
+                0x00200870                keyboard_init
+                0x00200880                keyboard_status_get
+ *fill*         0x00200886        0xa 
+ .text          0x00200890       0x1b build/boot.o
+                0x00200890                _start
+                0x002008a3                idt_load
+ *fill*         0x002008ab        0x5 
+ .text          0x002008b0       0x9a build/gdt.o
+                0x002008ce                gdt_load
+ *fill*         0x0020094a        0x6 
+ .text          0x00200950       0x99 build/irq.o
+                0x00200950                irq0
+                0x00200957                irq1
+                0x0020095e                irq2
+                0x00200965                irq3
+                0x0020096c                irq4
+                0x00200973                irq5
+                0x0020097a                irq6
+                0x00200981                irq7
+                0x00200988                irq8
+                0x0020098f                irq9
+                0x00200996                irq10
+                0x0020099d                irq11
+                0x002009a4                irq12
+                0x002009ab                irq13
+                0x002009b2                irq14
+                0x002009b9                irq15
+ *fill*         0x002009e9        0x7 
+ .text          0x002009f0      0x124 build/isr.o
+                0x002009f0                isr0
+                0x002009fa                isr1
+                0x00200a04                isr2
+                0x00200a0e                isr3
+                0x00200a18                isr4
+                0x00200a22                isr5
+                0x00200a2c                isr6
+                0x00200a36                isr7
+                0x00200a40                isr8
+                0x00200a48                isr9
+                0x00200a52                isr10
+                0x00200a5a                isr11
+                0x00200a62                isr12
+                0x00200a6a                isr13
+                0x00200a6f                isr14
+                0x00200a74                isr15
+                0x00200a7b                isr16
+                0x00200a82                isr17
+                0x00200a89                isr18
+                0x00200a90                isr19
+                0x00200a97                isr20
+                0x00200a9e                isr21
+                0x00200aa5                isr22
+                0x00200aac                isr23
+                0x00200ab3                isr24
+                0x00200aba                isr25
+                0x00200ac1                isr26
+                0x00200ac8                isr27
+                0x00200acf                isr28
+                0x00200ad6                isr29
+                0x00200add                isr30
+                0x00200ae4                isr31
+ *fill*         0x00200b14        0xc 
+ .text          0x00200b20      0x1fb build/vgadisplay_drv.o
+                0x00200b20                vga_init
+                0x00200b52                color_set
+                0x00200b67                clear_screen
+                0x00200b86                cursor_pos_get
+                0x00200b95                scroll_up
+                0x00200bb5                cursor_state_set
+                0x00200c02                cursor_set
+                0x00200c2e                print_string
+                0x00200c55                cursor_set_position
+                0x00200caf                put_char
+
+.iplt           0x00200d1b        0x0
+ .iplt          0x00200d1b        0x0 build/common.o
+
+.rel.dyn        0x00200d1c        0x0
+ .rel.got       0x00200d1c        0x0 build/common.o
+ .rel.iplt      0x00200d1c        0x0 build/common.o
+
+.rodata
+ *(.rodata)
+
+.rodata.str1.1  0x00200d1b      0x197
+ .rodata.str1.1
+                0x00200d1b      0x197 build/kernel.o
+
+.data           0x00201000       0x87
+ *(.data)
+ .data          0x00201000        0x0 build/common.o
+ .data          0x00201000        0x0 build/convert.o
+ .data          0x00201000       0x80 build/kernel.o
+                0x00201000                exception_messages
+ .data          0x00201080        0x0 build/keyboard_drv.o
+ .data          0x00201080        0x7 build/vgadisplay_drv.o
+
+.got            0x00201088        0x0
+ .got           0x00201088        0x0 build/common.o
+
+.got.plt        0x00201088        0x0
+ .got.plt       0x00201088        0x0 build/common.o
+
+.igot.plt       0x00201088        0x0
+ .igot.plt      0x00201088        0x0 build/common.o
+
+.bss            0x00202000     0x4c20
+ *(COMMON)
+ *(.bss)
+ .bss           0x00202000        0x0 build/common.o
+ .bss           0x00202000        0x0 build/convert.o
+ .bss           0x00202000      0xc20 build/kernel.o
+                0x00202000                interrupt_handlers
+                0x00202400                idtp
+                0x00202420                idt
+ .bss           0x00202c20        0x0 build/keyboard_drv.o
+ .bss           0x00202c20     0x4000 build/boot.o
+OUTPUT(build/bonesOS.bin elf32-i386)
+
+.debug_info     0x00000000     0x1d02
+ .debug_info    0x00000000       0xe7 build/common.o
+ .debug_info    0x000000e7       0x8b build/convert.o
+ .debug_info    0x00000172     0x18c6 build/kernel.o
+ .debug_info    0x00001a38      0x106 build/keyboard_drv.o
+ .debug_info    0x00001b3e       0x59 build/boot.o
+ .debug_info    0x00001b97       0x58 build/gdt.o
+ .debug_info    0x00001bef       0x58 build/irq.o
+ .debug_info    0x00001c47       0x58 build/isr.o
+ .debug_info    0x00001c9f       0x63 build/vgadisplay_drv.o
+
+.debug_abbrev   0x00000000      0x59b
+ .debug_abbrev  0x00000000       0x9e build/common.o
+ .debug_abbrev  0x0000009e       0x7e build/convert.o
+ .debug_abbrev  0x0000011c      0x323 build/kernel.o
+ .debug_abbrev  0x0000043f       0xcb build/keyboard_drv.o
+ .debug_abbrev  0x0000050a       0x1d build/boot.o
+ .debug_abbrev  0x00000527       0x1d build/gdt.o
+ .debug_abbrev  0x00000544       0x1d build/irq.o
+ .debug_abbrev  0x00000561       0x1d build/isr.o
+ .debug_abbrev  0x0000057e       0x1d build/vgadisplay_drv.o
+
+.debug_loclists
+                0x00000000      0x986
+ .debug_loclists
+                0x00000000       0x15 build/common.o
+ .debug_loclists
+                0x00000015       0x25 build/convert.o
+ .debug_loclists
+                0x0000003a      0x92e build/kernel.o
+ .debug_loclists
+                0x00000968       0x1e build/keyboard_drv.o
+
+.debug_aranges  0x00000000      0x120
+ .debug_aranges
+                0x00000000       0x20 build/common.o
+ .debug_aranges
+                0x00000020       0x20 build/convert.o
+ .debug_aranges
+                0x00000040       0x20 build/kernel.o
+ .debug_aranges
+                0x00000060       0x20 build/keyboard_drv.o
+ .debug_aranges
+                0x00000080       0x20 build/boot.o
+ .debug_aranges
+                0x000000a0       0x20 build/gdt.o
+ .debug_aranges
+                0x000000c0       0x20 build/irq.o
+ .debug_aranges
+                0x000000e0       0x20 build/isr.o
+ .debug_aranges
+                0x00000100       0x20 build/vgadisplay_drv.o
+
+.debug_rnglists
+                0x00000000      0x2f6
+ .debug_rnglists
+                0x00000000       0x13 build/common.o
+ .debug_rnglists
+                0x00000013      0x2e3 build/kernel.o
+
+.debug_line     0x00000000     0x1175
+ .debug_line    0x00000000       0xc4 build/common.o
+ .debug_line    0x000000c4       0x7a build/convert.o
+ .debug_line    0x0000013e      0xc51 build/kernel.o
+ .debug_line    0x00000d8f       0x74 build/keyboard_drv.o
+ .debug_line    0x00000e03       0x4b build/boot.o
+ .debug_line    0x00000e4e       0x67 build/gdt.o
+ .debug_line    0x00000eb5       0x8c build/irq.o
+ .debug_line    0x00000f41       0xc6 build/isr.o
+ .debug_line    0x00001007      0x16e build/vgadisplay_drv.o
+
+.debug_str      0x00000000      0x4a7
+ .debug_str     0x00000000      0x4a7 build/common.o
+                                 0xf5 (size before relaxing)
+ .debug_str     0x000004a7       0x65 build/convert.o
+ .debug_str     0x000004a7      0x4d6 build/kernel.o
+ .debug_str     0x000004a7      0x115 build/keyboard_drv.o
+
+.debug_line_str
+                0x00000000       0xd5
+ .debug_line_str
+                0x00000000       0xd5 build/common.o
+                                 0xa4 (size before relaxing)
+ .debug_line_str
+                0x000000d5       0x5a build/convert.o
+ .debug_line_str
+                0x000000d5       0xe3 build/kernel.o
+ .debug_line_str
+                0x000000d5       0xb6 build/keyboard_drv.o
+
+.comment        0x00000000       0x12
+ .comment       0x00000000       0x12 build/common.o
+                                 0x13 (size before relaxing)
+ .comment       0x00000012       0x13 build/convert.o
+ .comment       0x00000012       0x13 build/kernel.o
+ .comment       0x00000012       0x13 build/keyboard_drv.o
+
+.debug_frame    0x00000000      0x1d0
+ .debug_frame   0x00000000       0x40 build/common.o
+ .debug_frame   0x00000040       0x3c build/convert.o
+ .debug_frame   0x0000007c      0x120 build/kernel.o
+ .debug_frame   0x0000019c       0x34 build/keyboard_drv.o
+ .debug_frame   0x000001d0        0x0 build/boot.o
+ .debug_frame   0x000001d0        0x0 build/gdt.o
+ .debug_frame   0x000001d0        0x0 build/irq.o
+ .debug_frame   0x000001d0        0x0 build/isr.o
+ .debug_frame   0x000001d0        0x0 build/vgadisplay_drv.o
+
+.debug_pubnames
+                0x00000000        0x0
+ .debug_pubnames
+                0x00000000        0x0 build/boot.o
+ .debug_pubnames
+                0x00000000        0x0 build/gdt.o
+ .debug_pubnames
+                0x00000000        0x0 build/irq.o
+ .debug_pubnames
+                0x00000000        0x0 build/isr.o
+ .debug_pubnames
+                0x00000000        0x0 build/vgadisplay_drv.o
+
+.debug_loc      0x00000000        0x0
+ .debug_loc     0x00000000        0x0 build/boot.o
+ .debug_loc     0x00000000        0x0 build/gdt.o
+ .debug_loc     0x00000000        0x0 build/irq.o
+ .debug_loc     0x00000000        0x0 build/isr.o
+ .debug_loc     0x00000000        0x0 build/vgadisplay_drv.o

@@ -13,26 +13,26 @@ null_descriptor:
     dd 0x0
 
 ;offset 0x8 (8 bytes)
-code_desriptor:    ; cs should point ro this descriptor
+code_descriptor:    ; cs should point to this descriptor
     dw 0xffff       ; Segment Limit 
     dw 0x0          ; base first 0-15 bits
     db 0x0          ; base 16-23 bits
-    db 0b10011010   ; Access Flags
+    db 0b10011010   ; Access Flags 0x9A
                     ; Code  Conform     readable    accessed 
                     ; 1     0           0           1  
                     ; low 4 bits 
                     ; Gran  32Bit   64Bits  AVL
                     ; 1     1       0       0
                     ; Granularity Limit X 0x1000
-    db 0b11001111   ; What is this flag
+    db 0b11001111   ; 0xCF
     db 0x0          ; base 24-32 bits
 
 data_descriptor:   ; ds,es,fs,gs,ss should point here
     dw 0xffff       ; segment limit 0-15 bits
     dw 0x0          ; base frist 0-15 bits
     db 0x0          ; base 16-23 bits
-    db 0b10010010         ; access Flags
-    db 0b11001111   ; High bits flags
+    db 0b10010010         ; access Flags 0x02
+    db 0b11001111   ; High bits flags 0xCF
                     ; Code  Direction   Writable    accessed 
                     ; 0     0           1           0  
                     ; low 4 bits ?? heck these!!
@@ -46,7 +46,7 @@ gdt_descriptor:
         dw gdt_end - gdt_start -1
         dd gdt_start
 
-CODE_SEG    equ code_desriptor-gdt_start
+CODE_SEG    equ code_descriptor-gdt_start
 DATA_SEG    equ data_descriptor-gdt_start
 
 gdt_load:
@@ -57,6 +57,7 @@ gdt_load:
     or eax, 1
     mov cr0,eax
     ; jmp to code segment
+    sti  ; Set Inetrrupt flag
     jmp CODE_SEG:start_protected_mode
 
     [bits 32]
@@ -87,6 +88,7 @@ gdt_load:
     mov [0xb8014], ax
     mov al,'!'
     mov [0xb8016], ax
+
 
     ret
     
