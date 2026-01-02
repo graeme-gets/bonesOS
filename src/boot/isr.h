@@ -1,7 +1,6 @@
 #ifndef _ISR_H_
 #define _ISR_H_
 #include "common.h"
-#include "vgadisplay_drv.h"
 
 extern void isr0();
 extern void isr1();
@@ -161,9 +160,9 @@ void isr_handler(struct regs *r) {
     handler(r);
   }
   else if (r->int_no < 32) {
-    put_char('\n');
-    print_string(exception_messages[r->int_no]);
-    print_string(" Interrupt received!");
+   // put_char('\n');
+   // print_string(exception_messages[r->int_no]);
+   // print_string(" Interrupt received!");
   }
 }
 

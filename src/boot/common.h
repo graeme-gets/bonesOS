@@ -5,7 +5,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-uint8_t *memset(uint8_t *dest, size_t size, uint8_t val);
 
 struct regs {
   uint32_t gs, fs, es, ds;

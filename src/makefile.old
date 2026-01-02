@@ -1,5 +1,5 @@
 
-BUILD_DIR = build
+BUILD_DIR = ../build
 C_SOURCES := $(wildcard *.c)
 ASM_SOURCES := $(wildcard *.asm)
 OBJS := $(C_SOURCES:%.c=$(BUILD_DIR)/%.o)
@@ -7,10 +7,14 @@ ASM_OBJS := $(ASM_SOURCES:%.asm=$(BUILD_DIR)/%.o)
 CC := i686-elf-gcc
 CFLAGS := -g -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 
+SYSROOT := "build/sysroot"
+
 all: $(OBJS) $(ASM_OBJS)
-	echo Build full system
+
+
 	$(CC) -Xlinker -Map $(BUILD_DIR)/bonesOS.map -T linker.ld -o $(BUILD_DIR)/bonesOS.bin -ffreestanding -O2 -nostdlib $(OBJS) $(ASM_OBJS) -lgcc
 
+	mkdir -p $(SYSROOT)
 
 	# Create Disk Image for CD ROM
 	mkdir -p $(BUILD_DIR)/isodir/boot/grub

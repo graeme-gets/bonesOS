@@ -1,11 +1,9 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-//#include <stdlib.h>
-#include "common.h"
-#include "idt.h"
-#include "isr.h"
-#include "idt.h"
+#include "../libc/include/string.h"
+#include "../boot/idt.h"
+#include "../boot/isr.h"
 #include "vgadisplay_drv.h"
 #include "keyboard_drv.h"
 #include "convert.h"
